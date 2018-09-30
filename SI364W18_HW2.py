@@ -15,6 +15,8 @@ from flask import Flask, request, render_template, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField, ValidationError
 from wtforms.validators import Required
+import requests
+import json
 
 #####################
 ##### APP SETUP #####
@@ -38,10 +40,38 @@ app.config['SECRET_KEY'] = 'hardtoguessstring'
 def hello_world():
     return 'Hello World!'
 
-
 @app.route('/user/<name>')
 def hello_user(name):
     return '<h1>Hello {0}<h1>'.format(name)
+
+@app.route('/artistform')
+def artistform():
+    return render_template('artistform.html')
+
+@app.route('/artistinfo')
+def artistinfo(methods=['GET']):
+    artist_name = request.args.get('artist', '')
+    params = {"term" : artist_name}
+    base_url = 'https://itunes.apple.com/search/'
+    response = requests.get(base_url, params = params)
+    text = response.text
+    python_obj = json.loads(text)
+    objects = python_obj['results']
+    return render_template('artist_info.html', objects = objects)
+
+# Use GET method to get "name" from the artist form
+# Set name as a param in Itunes API
+# Return "Objects and HTML will return the top three songs"
+
+
+
+# @app.route('/artistlinks')
+# def artistlinks():
+#     return render_template('artist_links.html')
+#
+# @app.route('/specific/song/<artist_name>')
+# def specificsartist():
+#     return render_template('specific_artist.html')
 
 
 if __name__ == '__main__':

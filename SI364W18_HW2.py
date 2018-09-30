@@ -14,7 +14,7 @@
 from flask import Flask, request, render_template, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, RadioField, ValidationError
-from wtforms.validators import Required
+from wtforms.validators import Required, DataRequired
 import requests
 import json
 
@@ -29,7 +29,10 @@ app.config['SECRET_KEY'] = 'hardtoguessstring'
 ###### FORMS #######
 ####################
 
-
+class AlbumEntryForm(FlaskForm):
+    album_name = StringField('Enter the name of an album:', validators=[DataRequired()])
+    rank = RadioField('How much do you like this album? (1 low, 3 high)', choices = ['1','2', '3'], validators=[DataRequired()])
+    submit = SubmitField("Submit")
 
 
 ####################
@@ -73,6 +76,15 @@ def specificsartist(artist_name):
     objects = python_obj['results']
     return render_template('specific_artist.html', results = objects)
 
+@app.route('/album_entry')
+def album_entry():
+    album_form = AlbumEntryForm()
+    return rendertemplate('album_entry.html', form = album_form)
+
+@app.route('/album_result')
+def album_entry():
+    album_form = AlbumEntryForm()
+    return album_form
 
 
 if __name__ == '__main__':

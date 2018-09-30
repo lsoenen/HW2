@@ -31,13 +31,14 @@ app.config['SECRET_KEY'] = 'hardtoguessstring'
 
 class AlbumEntryForm(FlaskForm):
     album_name = StringField('Enter the name of an album:', validators=[DataRequired()])
-    rank = RadioField('How much do you like this album? (1 low, 3 high)', choices = ['1','2', '3'], validators=[DataRequired()])
+    rank = RadioField('How much do you like this album? (1 low, 3 high)', choices = [('1', '1'), ('2', '2'),('3', '3')], validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 
 ####################
 ###### ROUTES ######
 ####################
+
 
 @app.route('/')
 def hello_world():
@@ -79,12 +80,17 @@ def specificsartist(artist_name):
 @app.route('/album_entry')
 def album_entry():
     album_form = AlbumEntryForm()
-    return rendertemplate('album_entry.html', form = album_form)
+    return render_template('album_entry.html', form = album_form)
 
 @app.route('/album_result')
-def album_entry():
+def album_result():
     album_form = AlbumEntryForm()
-    return album_form
+    if album_form.validate_on_submit():
+        album_name = album_form.album_name.data
+        rank = album_form.rank.data
+        return render_template('album_data.html', name = album_name, liking = rank)
+    return 'Sorry no data available'
+
 
 
 if __name__ == '__main__':
